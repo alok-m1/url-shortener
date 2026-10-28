@@ -1,40 +1,28 @@
-# URL Shortener
+# url-shortner
 
-A simple URL shortener service written in Go.
-
-## Prerequisites
-
-- Go 1.21+ (`go version`)
-
-## Getting Started
+To install dependencies:
 
 ```bash
-# init module (if not already done)
-go mod init example.com/url-shortner
-
-# run
-go mod tidy
-go run .
-
-# build
-go build -o app .
+bun install
 ```
 
-## Project Structure
+To run:
 
-```
-.
-├── main.go       # entrypoint
-├── go.mod
-├── go.sum
-└── README.md
+```bash
+bun run index.ts
 ```
 
-## API (planned)
+To type check:
 
-- `POST /shorten` - `{ "url": "https://example.com" }` -> `{ "short": "abc123" }`
-- `GET /{short}` - redirect to original URL
+```bash
+bun run typecheck
+```
 
-## License
+To lint:
 
-MIT
+```bash
+bun run lint
+bun run lint:fix
+```
+
+This project was created using `bun init` in bun v1.4.3. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
