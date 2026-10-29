@@ -4,6 +4,7 @@ import { redis } from "../../catch/redis";
 import { db } from "../../db/db";
 import { urlsTable } from "../../db/schema";
 import { ERRORS, URL_CACHE } from "../../lib/constant";
+import { isKafkaReady, publishClickEvent } from "../../lib/kafka";
 
 const MAX_ATTEMPTS = 5;
 
@@ -70,6 +71,23 @@ export async function registerClick(shortCode: string) {
     .update(urlsTable)
     .set({ clicks: sql`${urlsTable.clicks} + 1` })
     .where(eq(urlsTable.shortCode, shortCode));
+}
+
+/**
+ * Click counting goes through Kafka so redirects are not blocked on a
+ * Postgres write. If Kafka is down, fall back to updating Postgres directly.
+ */
+export async function recordClick(shortCode: string) {
+  if (isKafkaReady()) {
+    try {
+      await publishClickEvent(shortCode);
+      return;
+    } catch (error) {
+      console.error("Kafka publish failed, updating Postgres directly:", error);
+    }
+  }
+
+  await registerClick(shortCode);
 }
 
 export async function listUrls(userId: string) {

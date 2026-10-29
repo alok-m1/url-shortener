@@ -4,6 +4,7 @@ import type { ErrorRequestHandler } from "express";
 import { env } from "../env";
 import { apiRoutes, publicRoutes } from "./features";
 import { ERRORS } from "./lib/constant";
+import { startKafka, stopKafka } from "./lib/kafka";
 
 const app = express();
 
@@ -28,6 +29,17 @@ const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
 
 app.use(errorHandler);
 
-app.listen(env.PORT, () => {
+await startKafka();
+
+const server = app.listen(env.PORT, () => {
   console.log(`Server running at http://localhost:${env.PORT}`);
 });
+
+async function shutdown() {
+  server.close();
+  await stopKafka();
+  process.exit(0);
+}
+
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);

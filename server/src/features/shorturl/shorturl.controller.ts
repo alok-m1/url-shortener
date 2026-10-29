@@ -10,7 +10,7 @@ import {
   deleteUrl,
   getUrlByShortCode,
   listUrls,
-  registerClick,
+  recordClick,
 } from "./shorturl.service";
 
 function toShortUrl(req: Request, shortCode: string) {
@@ -87,6 +87,6 @@ export async function redirect(req: Request, res: Response) {
     return;
   }
 
-  await registerClick(url.shortCode);
+  await recordClick(url.shortCode);
   res.redirect(302, url.originalUrl);
 }
